@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"gopkg.in/mgo.v2/bson"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -24,13 +22,6 @@ const (
 	passwordKey = key("passwordKey")
 	databaseKey = key("databaseKey")
 )
-
-// Example of json to bson marshaling
-// Note, there are many more fields in the listingsAndReview data sample
-type Listing struct {
-	ID         bson.ObjectId `bson:"_id,omitempty"`
-	ListingURL string        `bson:"listing_url"`
-}
 
 // setEnv sets environment variables
 // TODO: deprecate before shipping!
