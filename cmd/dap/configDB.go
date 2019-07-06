@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"gopkg.in/mgo.v2/bson"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -23,12 +25,17 @@ const (
 	databaseKey = key("databaseKey")
 )
 
+// Example of json to bson marshaling
+// Note, there are many more fields in the listingsAndReview data sample
+type Listing struct {
+	ID         bson.ObjectId `bson:"_id,omitempty"`
+	ListingURL string        `bson:"listing_url"`
+}
+
 // setEnv sets environment variables
 // TODO: deprecate before shipping!
 func setEnv() {
-	os.Setenv("MONGO_HOST", "mongodb+srv://cluster0-zabfy.gcp.mongodb.net/test")
-	os.Setenv("MONGO_USERNAME", "foo")
-	os.Setenv("MONGO_PASSWORD", "bar")
+	os.Setenv("MONGO_HOST", "mongodb+srv://foo:bar@cluster0-zabfy.gcp.mongodb.net/test?retryWrites=true&w=majority")
 	os.Setenv("MONGO_DATABASE", "sample_airbnb")
 }
 
@@ -36,18 +43,7 @@ func setEnv() {
 func NewDap(ctx context.Context, collectionName string) (*DAP, error) {
 	setEnv() // TODO: deprecate before shipping!
 	dap := &DAP{}
-
-	ctx = context.WithValue(ctx, hostKey, os.Getenv("MONGO_HOST"))
-	ctx = context.WithValue(ctx, usernameKey, os.Getenv("MONGO_USERNAME"))
-	ctx = context.WithValue(ctx, passwordKey, os.Getenv("MONGO_PASSWORD"))
-	ctx = context.WithValue(ctx, databaseKey, os.Getenv("MONGO_DATABASE"))
-
-	uri := fmt.Sprintf(`mongodb://%s:%s@%s/%s`,
-		ctx.Value(usernameKey).(string),
-		ctx.Value(passwordKey).(string),
-		ctx.Value(hostKey).(string),
-		ctx.Value(databaseKey).(string),
-	)
+	uri := os.Getenv("MONGO_HOST")
 
 	// Create client
 	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
