@@ -9,31 +9,22 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Config exports a configured data access portal
+// DAP (data access portal) exportable member
 type DAP struct {
-	Conn *mongo.Collection
+	DAP *mongo.Collection
 }
-
-type key string
-
-const (
-	hostKey     = key("hostKey")
-	usernameKey = key("usernameKey")
-	passwordKey = key("passwordKey")
-	databaseKey = key("databaseKey")
-)
 
 // setEnv sets environment variables
 // TODO: deprecate before shipping!
 func setEnv() {
 	os.Setenv("MONGO_HOST", "mongodb+srv://foo:bar@cluster0-zabfy.gcp.mongodb.net/test?retryWrites=true&w=majority")
-	os.Setenv("MONGO_DATABASE", "sample_airbnb")
+	os.Setenv("MONGO_DATABASE", "greenmap-products")
 }
 
 // NewDap creates a mongoDB collection DAP
 func NewDap(ctx context.Context, collectionName string) (*DAP, error) {
 	setEnv() // TODO: deprecate before shipping!
-	dap := &DAP{}
+	d := &DAP{}
 	uri := os.Getenv("MONGO_HOST")
 
 	// Create client
@@ -49,7 +40,7 @@ func NewDap(ctx context.Context, collectionName string) (*DAP, error) {
 	}
 
 	// Connect to collection
-	dap.Conn = client.Database(os.Getenv("MONGO_DATABASE")).Collection(collectionName)
+	d.DAP = client.Database(os.Getenv("MONGO_DATABASE")).Collection(collectionName)
 
-	return dap, nil
+	return d, nil
 }
